@@ -1,6 +1,6 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
-BRANCH = "master"
+BRANCH = "s2ram"
 SRCREV = "${AUTOREV}"
 LINUX_VERSION = "4.14.75"
 
