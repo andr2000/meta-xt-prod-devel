@@ -1,8 +1,7 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+SRCREV = "${AUTOREV}"
 
-SRC_URI += "\
-    file://0001-rcar-Use-UART-instead-of-Secure-DRAM-area-for-loggin.patch \
-    file://0002-tools-Produce-two-cert_header_sa6-images.patch \
+SRC_URI = "\
+    git://github.com/xen-troops/arm-trusted-firmware.git;branch=s2ram \
 "
 
 do_deploy_append () {
