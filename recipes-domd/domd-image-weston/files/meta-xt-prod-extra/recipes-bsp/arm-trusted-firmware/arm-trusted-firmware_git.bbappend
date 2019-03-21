@@ -1,3 +1,5 @@
+LIC_FILES_CHKSUM = "file://license.rst;md5=e927e02bca647e14efd87e9e914b2443"
+
 SRCREV = "${AUTOREV}"
 
 SRC_URI = "\
