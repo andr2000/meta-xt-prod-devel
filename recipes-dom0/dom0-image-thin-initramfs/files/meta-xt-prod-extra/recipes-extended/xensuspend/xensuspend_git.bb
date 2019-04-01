@@ -10,4 +10,14 @@ S = "${WORKDIR}/git"
 
 inherit setuptools3
 
-RDEPENDS_${PN} = "pyxs xen-xl xen-xenstat xen-xenstore python3-ctypes python3-shell"
+RDEPENDS_${PN} = "\
+	       pyxs \
+	       xen-xl \
+	       xen-xenstat \
+	       xen-xenstore \
+	       python3-argparse \
+	       python3-ctypes \
+	       python3-shell \
+	       python3-lockfile\
+	       python3-daemon \
+	       "
