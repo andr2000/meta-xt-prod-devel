@@ -1,0 +1,60 @@
+#!/bin/sh
+#
+# xensuspend   Script to start xensuspend in the daemon mode
+#
+# Author:      Volodymyr Babchuk <volodymyr_babchuk@epam.com>
+#
+# chkconfig: 2345 70 10
+# description: Starts and stops xen suspend daemon
+### BEGIN INIT INFO
+# Provides:          xensuspend
+# Required-Start:    $xenstored
+# Should-Start:
+# Required-Stop:     $xenstored
+# Should-Stop:
+# Default-Start:     2 3 5
+# Default-Stop:      0 1 6
+# Short-Description: Start/stop xensuspend
+# Description:       Starts and stops xen suspen daemon
+### END INIT INFO
+
+do_start () {
+    echo "Starting xensuspend"
+    /usr/bin/xensuspend daemon
+}
+
+do_stop () {
+    echo "Stopping xensuspend"
+
+    kill `cat /var/run/xensuspend.pid`
+}
+
+do_status () {
+    echo "Status command is not supported"
+}
+
+case "$1" in
+  start)
+        do_start
+        ;;
+  status)
+        do_status
+        ;;
+  stop)
+        do_stop
+        ;;
+  reload)
+        echo >&2 'Reload not available; use force-reload'; exit 1
+        ;;
+  force-reload|restart)
+        do_stop
+        do_start
+        ;;
+  *)
+        # do not advertise unreasonable commands that there is no reason
+        # to use with this device
+        echo $"Usage: $0 {start|stop|status|restart|force-reload}"
+        exit 1
+esac
+
+exit $?
