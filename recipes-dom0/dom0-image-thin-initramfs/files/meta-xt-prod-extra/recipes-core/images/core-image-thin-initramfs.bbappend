@@ -14,6 +14,9 @@ IMAGE_INSTALL_append = " \
     domd \
     domd-run \
     domd-install-artifacts \
+    openssh-scp \
+    openssh-sshd \
+    haveged \
 "
 
 XT_GUESTS_INSTALL ?= "doma domf"
