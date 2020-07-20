@@ -11,6 +11,8 @@ SRC_URI = "\
     file://start_guest.sh \
     file://dom0_vcpu_pin.sh \
     file://xt_set_root_dev_cfg.sh \
+    file://dom0_netfront \
+    file://dom0_setup_netfront.sh \
 "
 
 S = "${WORKDIR}"
@@ -29,9 +31,14 @@ DOM0_ALLOWED_PCPUS_h3ulcb-4x2g-kf-xt = "4-7"
 
 FILES_${PN} = " \
     ${base_prefix}${XT_DIR_ABS_ROOTFS_SCRIPTS}/start_guest.sh \
+    ${base_prefix}${XT_DIR_ABS_ROOTFS_SCRIPTS}/dom0_setup_netfront.sh \
 "
 
 inherit update-rc.d
+
+FILES_${PN}-run += " \
+    ${sysconfdir}/init.d/dom0_netfront \
+"
 
 FILES_${PN}-run-vcpu_pin += " \
     ${sysconfdir}/init.d/dom0_vcpu_pin.sh \
@@ -42,13 +49,16 @@ FILES_${PN}-run-set_root_dev += " \
 "
 
 PACKAGES += " \
+    ${PN}-run \
     ${PN}-run-vcpu_pin \
     ${PN}-run-set_root_dev \
 "
 
 # configure init.d scripts
-INITSCRIPT_PACKAGES = "${PN}-run-vcpu_pin ${PN}-run-set_root_dev"
+INITSCRIPT_PACKAGES = "${PN}-run ${PN}-run-vcpu_pin ${PN}-run-set_root_dev"
 
+INITSCRIPT_NAME_${PN}-run = "dom0_netfront"
+INITSCRIPT_PARAMS_${PN}-run = "defaults 86"
 INITSCRIPT_NAME_${PN}-run-vcpu_pin = "dom0_vcpu_pin.sh"
 INITSCRIPT_PARAMS_${PN}-run-vcpu_pin = "defaults 81"
 # must run before any domain creation
@@ -61,6 +71,11 @@ do_install() {
     install -m 0744 ${WORKDIR}/start_guest.sh ${D}${base_prefix}${XT_DIR_ABS_ROOTFS_SCRIPTS}/
     install -m 0744 ${WORKDIR}/dom0_vcpu_pin.sh ${D}${sysconfdir}/init.d/
     install -m 0744 ${WORKDIR}/xt_set_root_dev_cfg.sh ${D}${sysconfdir}/init.d/
+
+    install -m 0744 ${WORKDIR}/dom0_setup_netfront.sh ${D}${base_prefix}${XT_DIR_ABS_ROOTFS_SCRIPTS}/
+
+    install -d ${D}${sysconfdir}/init.d
+    install -m 0744 ${WORKDIR}/dom0_netfront ${D}${sysconfdir}/init.d/
 
     # Fixup a number of PCPUs the VCPUs of Dom0 must run on
     sed -i "s/DOM0_ALLOWED_PCPUS/${DOM0_ALLOWED_PCPUS}/g" ${D}${sysconfdir}/init.d/dom0_vcpu_pin.sh

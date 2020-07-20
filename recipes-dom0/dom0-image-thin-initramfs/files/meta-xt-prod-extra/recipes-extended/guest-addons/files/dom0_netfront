@@ -1,0 +1,90 @@
+#!/bin/sh
+#
+# xencommons    Script to start network frontend
+#
+# Author:       Andrii Anisov <andrii_anisov@epam.com>
+#
+# chkconfig: 2345 70 10
+# description: Starts and stops net front in Dom0
+### BEGIN INIT INFO
+# Provides:          netfront
+# Required-Start:    $guest_domd
+# Should-Start:
+# Required-Stop:     $guest_domd
+# Should-Stop:
+# Default-Start:     2 3 5
+# Default-Stop:      0 1 6
+# Short-Description: Start/stop net front in Dom0
+# Description:       Starts and stops net front in Dom0
+### END INIT INFO
+
+DOMAIN_NAME="Network Frontend"
+SCRIPT_NAME="dom0_setup_netfront.sh"
+SCRIPT_PATH="/xt/scripts"
+GUEST="none"
+GUEST_DEPENDENCIES="bridge"
+
+# not running in Xen dom0
+if ! test -d /proc/xen ; then
+        exit 0
+fi
+
+do_start () {
+    echo "Starting ${DOMAIN_NAME}"
+
+    PID=`ps -ef | grep ${SCRIPT_NAME} | grep ${GUEST} | awk '{print $1;}' `
+
+    if [ ! -z $PID ] ; then
+        echo "${DOMAIN_NAME} start is waiting for backends"
+        exit 0
+    fi
+
+    ${SCRIPT_PATH}/${SCRIPT_NAME} ${GUEST} ${GUEST_DEPENDENCIES} &
+    echo "${DOMAIN_NAME} is scheduled to run"
+}
+
+do_stop () {
+    echo "Stopping ${DOMAIN_NAME}"
+
+    PID=`ps -ef | grep ${SCRIPT_NAME} | grep ${GUEST} | awk '{print $1;}' `
+
+    if [ ! -z $PID ] ; then
+        kill -SIGTERM PID
+    fi
+}
+
+do_status () {
+        PID=`ps -ef | grep ${SCRIPT_NAME} | grep ${GUEST} | awk '{print $1;}' `
+
+        if [ ! -z $PID ] ; then
+            echo "${DOMAIN_NAME} start is waiting for backends"
+        fi
+
+        exit 0
+}
+
+case "$1" in
+  start)
+        do_start
+        ;;
+  status)
+        do_status
+        ;;
+  stop)
+        do_stop
+        ;;
+  reload)
+        echo >&2 'Reload not available; use force-reload'; exit 1
+        ;;
+  force-reload|restart)
+        do_stop
+        do_start
+        ;;
+  *)
+        # do not advertise unreasonable commands that there is no reason
+        # to use with this device
+        echo $"Usage: $0 {start|stop|status|restart|force-reload}"
+        exit 1
+esac
+
+exit $?
