@@ -1,16 +1,10 @@
 IMAGE_INSTALL_append = " \
     pciutils \
-    pulseaudio \
-    alsa-utils \
-    wayland-ivi-extension \
     packagegroup-xt-core-guest-addons \
     packagegroup-xt-core-xen \
-    packagegroup-xt-core-pv \
     packagegroup-xt-core-network \
     kernel-modules \
-    kmscube \
     optee-os \
-    ${@bb.utils.contains('XT_GUESTS_INSTALL', 'doma', 'displaymanager', '', d)} \
     linux-firmware \
 "
 
