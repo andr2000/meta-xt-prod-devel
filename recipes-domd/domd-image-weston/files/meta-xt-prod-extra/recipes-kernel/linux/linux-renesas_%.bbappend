@@ -9,7 +9,12 @@ SRCREV = "${AUTOREV}"
 LINUX_VERSION = "4.14.75"
 SRC_URI_append = " \
     file://defconfig \
+    file://r8169.cfg \
 "
+
+# Do not autoload r8169 driver
+KERNEL_MODULE_PROBECONF += "r8169"
+module_conf_r8169 = "blacklist r8169"
 
 SRC_URI_append_rcar = " \
     file://salvator-generic-doma.dts;subdir=git/arch/${ARCH}/boot/dts/renesas \
