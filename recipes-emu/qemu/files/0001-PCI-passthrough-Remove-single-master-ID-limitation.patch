@@ -1,0 +1,35 @@
+From a67677b9a67c414dac7126372b306f4208a764ef Mon Sep 17 00:00:00 2001
+From: Oleksandr Andrushchenko <oleksandr_andrushchenko@epam.com>
+Date: Wed, 19 May 2021 11:03:08 +0300
+Subject: [PATCH] PCI passthrough: Remove single master ID limitation
+
+ZU+ hardware has a limitation in that the PCIe RC
+marks all transactions with Master-ID 0x4d0. So it's impossible to
+differentiate between end-point DMA's. This is the behaviour that
+QEMU models by default. For the purpose of testing PCIe passthrough,
+we can modify QEMU to remove the limitation of the single master-id.
+
+Signed-off-by: Oleksandr Andrushchenko <oleksandr_andrushchenko@epam.com>
+Suggested-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+---
+ include/hw/pci/pci.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index f08b72f89710..4ff401dd521d 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -794,7 +794,9 @@ static inline AddressSpace *pci_get_address_space(PCIDevice *dev)
+ static inline int pci_dma_rw(PCIDevice *dev, dma_addr_t addr,
+                              void *buf, dma_addr_t len, DMADirection dir)
+ {
+-    dma_memory_rw(pci_get_address_space(dev), addr, buf, len, dir);
++    MemTxAttrs attr = MEMTXATTRS_UNSPECIFIED;
++    attr.requester_id = pci_requester_id(dev);
++    dma_memory_rw_attr(pci_get_address_space(dev), addr, buf, len, dir, attr);
+     return 0;
+ }
+ 
+-- 
+2.31.1
+
